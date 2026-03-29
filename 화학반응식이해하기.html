@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>화학 반응식을 어떻게 나타낼까? — 미래엔 22~25쪽</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#1565C0; --bluel:#E3F2FD; --bluem:#BBDEFB;
+  --teal:#00796B; --teall:#E0F2F1;
+  --ora:#E65100;  --oral:#FFF3E0;
+  --grn:#2E7D32;  --grnl:#E8F5E9;
+  --amber:#F57F17;--ambl:#FFF8E1;
+  --red:#C62828;
+  --bg:#F0F4FA; --white:#fff; --card:#FAFBFF;
+  --shadow:rgba(0,0,0,.12);
+  /* atom colors */
+  --aC:#78909C; --aH:#FFD54F; --aO:#EF5350;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  font-family:'Noto Sans KR',-apple-system,sans-serif;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  touch-action:none;user-select:none;
+}
+
+/* ── HEADER ──────────────────────────────────────── */
+#hdr{
+  flex-shrink:0;
+  background:linear-gradient(135deg,#0D47A1,#1565C0);
+  color:#fff;padding:8px 14px;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 2px 8px var(--shadow);
+}
+#hdr h1{font-size:clamp(12px,2.3vw,16px);font-weight:900;line-height:1.2;}
+#hdr small{font-size:clamp(8px,1.3vw,10px);opacity:.75;}
+
+/* ── STEP NAV ────────────────────────────────────── */
+#stepnav{
+  flex-shrink:0;
+  background:var(--white);
+  border-bottom:2px solid var(--bluem);
+  padding:0 12px;
+  display:flex;align-items:stretch;gap:0;
+  box-shadow:0 1px 4px var(--shadow);
+  overflow-x:auto;scrollbar-width:none;
+}
+#stepnav::-webkit-scrollbar{display:none;}
+.snav{
+  flex-shrink:0;
+  display:flex;align-items:center;gap:7px;
+  padding:10px 14px;
+  border-bottom:3px solid transparent;
+  cursor:pointer;transition:all .2s;
+  color:#90A4AE;font-size:clamp(10px,1.7vw,13px);font-weight:700;
+  white-space:nowrap;
+}
+.snav.done{color:#4CAF50;}
+.snav.active{color:var(--blue);border-bottom-color:var(--blue);}
+.snav .snum{
+  width:22px;height:22px;border-radius:50%;
+  border:2px solid currentColor;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:900;flex-shrink:0;
+}
+.snav.done .snum{background:#4CAF50;border-color:#4CAF50;color:#fff;}
+.snav.active .snum{background:var(--blue);border-color:var(--blue);color:#fff;}
+.snav-sep{color:#CFD8DC;display:flex;align-items:center;font-size:16px;padding:0 2px;}
+
+/* ── MAIN SCROLL AREA ────────────────────────────── */
+#panel{
+  flex:1;min-height:0;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--bluem) transparent;
+  padding:12px;display:flex;flex-direction:column;gap:12px;
+}
+#panel::-webkit-scrollbar{width:4px;}
+#panel::-webkit-scrollbar-thumb{background:var(--bluem);border-radius:2px;}
+
+/* ── STEP PANEL ──────────────────────────────────── */
+.step-panel{display:none;flex-direction:column;gap:12px;}
+.step-panel.show{display:flex;}
+
+/* ── STEP TITLE ──────────────────────────────────── */
+.step-title{
+  display:flex;align-items:center;gap:10px;
+  background:var(--blue);
+  color:#fff;border-radius:12px;padding:10px 16px;
+  font-size:clamp(13px,2vw,16px);font-weight:900;
+}
+.step-title .badge{
+  flex-shrink:0;
+  background:rgba(255,255,255,.25);
+  border-radius:20px;padding:2px 10px;
+  font-size:11px;font-weight:700;
+}
+
+/* ── CARD ────────────────────────────────────────── */
+.card{
+  background:var(--white);border-radius:14px;
+  padding:14px 16px;
+  box-shadow:0 2px 8px var(--shadow);
+  border:1.5px solid var(--bluem);
+}
+.card-title{
+  font-size:12px;font-weight:700;color:var(--blue);
+  margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+.card-title::before{content:'';display:inline-block;width:4px;height:14px;background:var(--blue);border-radius:2px;}
+
+/* ── WORD EQUATION BUILDER (Step1) ──────────────── */
+.word-eq{
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:8px;justify-content:center;
+  padding:12px 8px;
+  background:var(--bluel);border-radius:10px;
+  border:2px solid var(--bluem);
+}
+.word-slot{
+  min-width:90px;height:40px;
+  border-radius:20px;border:2.5px dashed var(--blue);
+  background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#B0BEC5;
+  transition:all .2s;padding:0 10px;
+  cursor:pointer;
+}
+.word-slot.filled{border-style:solid;border-color:var(--blue);color:var(--blue);background:var(--bluel);}
+.word-slot.filled.correct{border-color:#4CAF50;color:#2E7D32;background:var(--grnl);}
+.word-eq-arrow{font-size:22px;font-weight:900;color:var(--blue);}
+.word-eq-plus{font-size:18px;font-weight:900;color:#90A4AE;}
+
+/* Word chips to drag/tap */
+.chip-pool{
+  display:flex;flex-wrap:wrap;gap:8px;
+  justify-content:center;padding:10px 8px;
+}
+.chip{
+  padding:8px 16px;border-radius:20px;
+  background:var(--blue);color:#fff;
+  font-size:13px;font-weight:700;
+  cursor:pointer;border:2px solid var(--blue);
+  transition:all .15s;
+  touch-action:none;
+}
+.chip:active{transform:scale(.94);}
+.chip.used{opacity:.3;pointer-events:none;}
+
+/* ── FORMULA EQUATION BUILDER (Step2) ───────────── */
+.formula-eq{
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:8px;justify-content:center;
+  padding:14px 10px;
+  background:#F8FAFF;border-radius:10px;
+  border:2px solid var(--bluem);
+}
+.f-slot{
+  min-width:70px;height:44px;padding:0 10px;
+  border-radius:10px;border:2.5px dashed var(--blue);
+  background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;color:#B0BEC5;
+  font-family:'Times New Roman',serif;
+  transition:all .2s;cursor:pointer;
+}
+.f-slot.filled{border-style:solid;border-color:var(--teal);color:var(--teal);background:var(--teall);}
+.f-slot.correct{border-color:#4CAF50;color:#2E7D32;background:var(--grnl);}
+.f-chip{
+  padding:8px 14px;border-radius:10px;
+  background:var(--teal);color:#fff;
+  font-size:15px;font-weight:700;
+  font-family:'Times New Roman',serif;
+  cursor:pointer;border:2px solid var(--teal);
+  transition:all .15s;
+}
+.f-chip:active{transform:scale(.94);}
+.f-chip.used{opacity:.3;pointer-events:none;}
+
+/* ── COEFFICIENT STEP (Step3) ────────────────────── */
+.coef-eq{
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:8px;justify-content:center;
+  padding:14px 10px;
+  background:#FFFDE7;border-radius:10px;
+  border:2px solid #FFE082;
+}
+.coef-unit{display:flex;align-items:center;gap:4px;}
+.coef-box{
+  width:42px;height:42px;
+  border-radius:8px;border:2.5px solid #FFB300;
+  background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:900;color:#F57F17;
+  font-family:monospace;
+  flex-shrink:0;
+}
+.coef-box.correct{border-color:#4CAF50;color:#2E7D32;background:var(--grnl);}
+.coef-mol{
+  font-size:17px;font-weight:700;color:#1A237E;
+  font-family:'Times New Roman',serif;
+}
+.coef-controls{display:flex;flex-direction:column;gap:3px;}
+.coef-btn{
+  width:26px;height:18px;
+  border-radius:4px;border:1.5px solid #FFB300;
+  background:#FFF8E1;color:#F57F17;
+  font-size:12px;font-weight:900;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  line-height:1;
+}
+.coef-btn:active{background:#FFE082;}
+
+/* ── MOLECULE SVG CARD ───────────────────────────── */
+.mol-row{
+  display:flex;flex-wrap:wrap;gap:10px;
+  justify-content:center;align-items:flex-end;
+  padding:10px 0;
+}
+.mol-card{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:#fff;border-radius:12px;
+  padding:8px 12px;
+  border:1.5px solid var(--bluem);
+  box-shadow:0 2px 6px rgba(0,0,0,.07);
+  min-width:60px;
+}
+.mol-name{font-size:10px;color:#607D8B;font-weight:700;font-family:monospace;}
+
+/* ── ATOM TABLE (Step3 / Info) ───────────────────── */
+.atom-table{width:100%;border-collapse:collapse;font-size:13px;}
+.atom-table th{
+  background:var(--blue);color:#fff;
+  padding:8px 10px;text-align:center;font-weight:700;
+}
+.atom-table td{
+  padding:8px 10px;text-align:center;
+  border:1px solid var(--bluem);
+}
+.atom-table tr:nth-child(even) td{background:#F0F7FF;}
+.atom-dot{
+  display:inline-flex;align-items:center;gap:5px;
+}
+.adot{width:14px;height:14px;border-radius:50%;display:inline-block;border:1.5px solid rgba(0,0,0,.15);}
+
+/* ── INFO CARDS (Step4) ──────────────────────────── */
+.info-grid{display:flex;flex-wrap:wrap;gap:10px;}
+.info-card{
+  flex:1;min-width:180px;
+  border-radius:12px;padding:12px 14px;
+  border:2px solid;
+}
+.info-card.blue{border-color:var(--blue);background:var(--bluel);}
+.info-card.teal{border-color:var(--teal);background:var(--teall);}
+.info-card.amber{border-color:var(--amber);background:var(--ambl);}
+.info-card .num{font-size:28px;font-weight:900;line-height:1;}
+.info-card.blue .num{color:var(--blue);}
+.info-card.teal .num{color:var(--teal);}
+.info-card.amber .num{color:var(--amber);}
+.info-card h3{font-size:13px;font-weight:900;margin:4px 0;}
+.info-card p{font-size:11px;line-height:1.6;color:#555;}
+
+/* ── RATIO BOX ───────────────────────────────────── */
+.ratio-box{
+  background:#FFF8E1;border-radius:10px;
+  padding:12px 16px;border:2px solid #FFB300;
+  text-align:center;
+}
+.ratio-formula{
+  font-size:clamp(14px,2.5vw,20px);font-weight:700;
+  font-family:'Times New Roman',serif;color:#1A237E;
+  margin:6px 0;letter-spacing:1px;
+}
+.ratio-eq{
+  font-size:13px;color:#5D4037;margin-top:6px;line-height:1.8;
+}
+
+/* ── BOTTOM BAR ──────────────────────────────────── */
+#bot{
+  flex-shrink:0;background:var(--white);border-top:2px solid var(--bluem);
+  padding:10px 14px;display:flex;gap:8px;align-items:center;
+  box-shadow:0 -2px 8px var(--shadow);
+}
+#feedback{
+  flex:1;padding:8px 12px;border-radius:10px;
+  font-size:clamp(11px,1.9vw,14px);font-weight:700;
+  background:#F5F5F5;color:#90A4AE;line-height:1.5;
+  transition:all .3s;
+}
+#feedback.ok{background:var(--grnl);color:var(--grn);}
+#feedback.warn{background:var(--oral);color:var(--ora);}
+#feedback.info{background:var(--bluel);color:var(--blue);}
+.act-btn{
+  flex-shrink:0;
+  padding:11px 20px;border-radius:12px;border:none;
+  font-size:clamp(12px,2vw,15px);font-weight:900;cursor:pointer;font-family:inherit;
+}
+.act-btn.primary{
+  background:linear-gradient(135deg,#1976D2,#0D47A1);color:#fff;
+  box-shadow:0 3px 8px rgba(13,71,161,.35);
+}
+.act-btn.primary:active{transform:scale(.96);}
+.act-btn.secondary{background:#fff;color:var(--blue);border:2px solid var(--bluem);}
+
+/* ── CONFETTI ────────────────────────────────────── */
+.cf{
+  position:fixed;pointer-events:none;z-index:9999;
+  animation:cffall 1.8s ease-out forwards;border-radius:2px;
+}
+@keyframes cffall{
+  from{opacity:1;transform:translateY(0) rotate(0);}
+  to{opacity:0;transform:translateY(95vh) rotate(720deg);}
+}
+
+/* ── HIGHLIGHT RING ──────────────────────────────── */
+.ring{outline:3px solid #FFB300;outline-offset:2px;border-radius:inherit;}
+
+@media(max-width:480px){
+  .info-grid{flex-direction:column;}
+  .info-card{min-width:unset;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div style="font-size:22px">📝</div>
+  <div>
+    <h1>화학 반응식을 어떻게 나타낼까?</h1>
+    <small>미래엔 중학교 3학년 과학 22~25쪽 탐구 활동</small>
+  </div>
+</div>
+
+<!-- STEP NAV -->
+<div id="stepnav">
+  <div class="snav active" id="sn0" onclick="goStep(0)">
+    <div class="snum">1</div>단계: 이름으로 쓰기
+  </div>
+  <div class="snav-sep">›</div>
+  <div class="snav" id="sn1" onclick="goStep(1)">
+    <div class="snum">2</div>단계: 화학식으로
+  </div>
+  <div class="snav-sep">›</div>
+  <div class="snav" id="sn2" onclick="goStep(2)">
+    <div class="snum">3</div>단계: 계수 맞추기
+  </div>
+  <div class="snav-sep">›</div>
+  <div class="snav" id="sn3" onclick="goStep(3)">
+    <div class="snum">✦</div>화학반응식의 의미
+  </div>
+</div>
+
+<!-- MAIN PANEL -->
+<div id="panel">
+
+  <!-- ══════════════════ STEP 1 ══════════════════ -->
+  <div class="step-panel show" id="sp0">
+    <div class="step-title">
+      <div class="badge">1단계</div>
+      반응물과 생성물을 이름(한글)으로 쓰고, 화살표로 연결하기
+    </div>
+
+    <div class="card">
+      <div class="card-title">📌 도움말</div>
+      <p style="font-size:12px;color:#546E7A;line-height:1.7;">
+        반응물은 화살표 <b>왼쪽</b>, 생성물은 화살표 <b>오른쪽</b>에 씁니다.<br>
+        반응물이나 생성물이 두 종류 이상이면 <b>'+'</b>로 연결합니다.<br>
+        아래 빈칸을 탭해서 올바른 물질 이름을 채워보세요!
+      </p>
+    </div>
+
+    <!-- Molecule display row -->
+    <div class="card">
+      <div class="card-title">🔬 반응 모형</div>
+      <div class="mol-row" id="mol-row-s1"></div>
+    </div>
+
+    <!-- Word equation builder -->
+    <div class="card">
+      <div class="card-title">✏️ 빈칸을 채워보세요</div>
+      <div class="word-eq">
+        <div class="word-slot" id="ws0" onclick="fillSlot(0)">?</div>
+        <span class="word-eq-plus">+</span>
+        <div class="word-slot" id="ws1" onclick="fillSlot(1)">?</div>
+        <span class="word-eq-arrow">→</span>
+        <div class="word-slot" id="ws2" onclick="fillSlot(2)">?</div>
+        <span class="word-eq-plus">+</span>
+        <div class="word-slot" id="ws3" onclick="fillSlot(3)">?</div>
+      </div>
+      <div style="height:10px"></div>
+      <div class="card-title">아래 이름 카드를 탭해서 빈칸을 채우세요</div>
+      <div class="chip-pool" id="chip-pool-s1"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ STEP 2 ══════════════════ -->
+  <div class="step-panel" id="sp1">
+    <div class="step-title">
+      <div class="badge">2단계</div>
+      반응물과 생성물을 화학식으로 나타내기
+    </div>
+    <div class="card">
+      <div class="card-title">📌 도움말</div>
+      <p style="font-size:12px;color:#546E7A;line-height:1.7;">
+        각 물질의 이름을 <b>화학식</b>으로 바꾸어 씁니다.<br>
+        아래 화학식 카드를 탭해서 해당 칸에 넣어보세요!
+      </p>
+    </div>
+    <div class="card">
+      <div class="card-title">🔬 1단계에서 완성한 반응식</div>
+      <div class="word-eq" style="background:#F1F8E9;border-color:#A5D6A7;">
+        <span style="font-size:14px;font-weight:700;color:#2E7D32;">메테인</span>
+        <span class="word-eq-plus">+</span>
+        <span style="font-size:14px;font-weight:700;color:#2E7D32;">산소</span>
+        <span class="word-eq-arrow">→</span>
+        <span style="font-size:14px;font-weight:700;color:#2E7D32;">물</span>
+        <span class="word-eq-plus">+</span>
+        <span style="font-size:14px;font-weight:700;color:#2E7D32;">이산화 탄소</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">✏️ 화학식으로 바꿔보세요</div>
+      <div class="formula-eq">
+        <div class="f-slot" id="fs0" onclick="fillFSlot(0)">?</div>
+        <span class="word-eq-plus">+</span>
+        <div class="f-slot" id="fs1" onclick="fillFSlot(1)">?</div>
+        <span class="word-eq-arrow">→</span>
+        <div class="f-slot" id="fs2" onclick="fillFSlot(2)">?</div>
+        <span class="word-eq-plus">+</span>
+        <div class="f-slot" id="fs3" onclick="fillFSlot(3)">?</div>
+      </div>
+      <div style="height:10px"></div>
+      <div class="card-title">화학식 카드를 탭해 선택 후 빈칸을 탭하세요</div>
+      <div class="chip-pool" id="chip-pool-s2"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ STEP 3 ══════════════════ -->
+  <div class="step-panel" id="sp2">
+    <div class="step-title">
+      <div class="badge">3단계</div>
+      계수를 맞춰 화학 반응식 완성하기
+    </div>
+    <div class="card">
+      <div class="card-title">📌 도움말</div>
+      <p style="font-size:12px;color:#546E7A;line-height:1.7;">
+        반응 <b>전후</b>에 원자의 종류와 수가 같아지도록 계수를 맞춥니다.<br>
+        ▲▼ 버튼을 눌러 각 분자의 계수를 조절하고 원자 수 표를 확인하세요.<br>
+        <b>도움말: 계수가 1이면 생략합니다.</b>
+      </p>
+    </div>
+
+    <!-- Coefficient equation -->
+    <div class="card">
+      <div class="card-title">⚙️ 계수 조절 (▲▼ 버튼 사용)</div>
+      <div class="coef-eq" id="coef-eq"></div>
+    </div>
+
+    <!-- Atom count table -->
+    <div class="card">
+      <div class="card-title">🔢 반응 전후 원자 수 비교표</div>
+      <table class="atom-table" id="atom-tbl">
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th><span class="atom-dot"><span class="adot" style="background:var(--aC)"></span>탄소(C)</span></th>
+            <th><span class="atom-dot"><span class="adot" style="background:var(--aH)"></span>수소(H)</span></th>
+            <th><span class="atom-dot"><span class="adot" style="background:var(--aO)"></span>산소(O)</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="tbl-before">
+            <td><b>반응 전</b><br><small style="color:#90A4AE">(반응물)</small></td>
+            <td id="tc-C-b">—</td><td id="tc-H-b">—</td><td id="tc-O-b">—</td>
+          </tr>
+          <tr id="tbl-after">
+            <td><b>반응 후</b><br><small style="color:#90A4AE">(생성물)</small></td>
+            <td id="tc-C-a">—</td><td id="tc-H-a">—</td><td id="tc-O-a">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Molecule models -->
+    <div class="card">
+      <div class="card-title">🔬 입자 모형으로 확인</div>
+      <div class="mol-row" id="mol-row-s3">
+        <div style="font-size:12px;color:#90A4AE">계수를 맞추면 모형이 업데이트됩니다</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ STEP 4 (Info) ══════════ -->
+  <div class="step-panel" id="sp3">
+    <div class="step-title" style="background:var(--teal);">
+      <div class="badge" style="background:rgba(255,255,255,.2)">완성!</div>
+      화학 반응식에서 알 수 있는 사실 (p.24~25)
+    </div>
+
+    <!-- Completed equation display -->
+    <div class="card" style="border-color:var(--teal);">
+      <div class="card-title" style="color:var(--teal);">✅ 완성된 화학 반응식</div>
+      <div style="text-align:center;padding:10px 0;">
+        <span style="font-size:clamp(18px,4vw,28px);font-weight:700;font-family:'Times New Roman',serif;color:#1A237E;letter-spacing:1px;">
+          CH₄ + 2O₂ → 2H₂O + CO₂
+        </span>
+      </div>
+    </div>
+
+    <!-- 3 info cards -->
+    <div class="info-grid">
+      <div class="info-card blue">
+        <div class="num">1</div>
+        <h3>반응물과 생성물</h3>
+        <p>화살표 <b>왼쪽</b>은 반응물,<br><b>오른쪽</b>은 생성물</p>
+        <div style="margin-top:8px;padding:7px 10px;background:rgba(21,101,192,.1);border-radius:8px;font-size:11px;">
+          반응물: <b>CH₄</b>, <b>O₂</b><br>
+          생성물: <b>H₂O</b>, <b>CO₂</b>
+        </div>
+      </div>
+      <div class="info-card teal">
+        <div class="num">2</div>
+        <h3>원자의 종류와 개수</h3>
+        <p>반응 전후 원자의 종류·수가 <b>변하지 않음</b></p>
+        <div style="margin-top:8px;padding:7px 10px;background:rgba(0,121,107,.1);border-radius:8px;font-size:11px;">
+          C: 1개 → 1개 ✓<br>
+          H: 4개 → 4개 ✓<br>
+          O: 4개 → 4개 ✓
+        </div>
+      </div>
+      <div class="info-card amber">
+        <div class="num">3</div>
+        <h3>계수의 의미 (입자 수 비)</h3>
+        <p>계수 = 입자 수의 비<br>반응·생성 양을 알 수 있음</p>
+        <div style="margin-top:8px;padding:7px 10px;background:rgba(245,127,23,.1);border-radius:8px;font-size:11px;">
+          CH₄ : O₂ : H₂O : CO₂<br>
+          <b>= 1 : 2 : 2 : 1</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ratio detail -->
+    <div class="card" style="border-color:#FFB300;">
+      <div class="card-title" style="color:var(--amber);">📐 계수비 자세히 보기</div>
+      <div class="ratio-box">
+        <div class="ratio-formula">CH₄ + 2O₂ → 2H₂O + CO₂</div>
+        <div class="ratio-eq">
+          메테인 <b>1</b>분자 + 산소 <b>2</b>분자 → 물 <b>2</b>분자 + 이산화탄소 <b>1</b>분자<br>
+          계수비 CH₄ : O₂ : H₂O : CO₂ = <b>1 : 2 : 2 : 1</b>
+        </div>
+      </div>
+      <div style="height:10px"></div>
+      <div style="background:var(--bluel);border-radius:8px;padding:10px 12px;font-size:12px;color:#1A237E;line-height:1.8;">
+        💡 <b>메테인 분자 2개가 연소할 때</b> 필요한 산소 분자는?<br>
+        → 계수비 1 : 2 이므로 산소 분자 <b>4개</b><br>
+        → 생성되는 물 분자는 <b>4개</b>, 이산화탄소는 <b>2개</b>
+      </div>
+    </div>
+
+    <!-- Practice question -->
+    <div class="card" style="border-color:var(--grn);">
+      <div class="card-title" style="color:var(--grn);">🧪 스스로 확인하기 (p.25)</div>
+      <p style="font-size:12px;color:#555;line-height:1.8;margin-bottom:10px;">
+        일산화 탄소(CO)가 연소하면 이산화 탄소(CO₂)가 생성된다.<br>
+        이 반응을 화학 반응식으로 나타내면? <b>2CO + O₂ → 2CO₂</b>
+      </p>
+      <div style="background:var(--grnl);border-radius:8px;padding:10px;font-size:12px;color:#1B5E20;line-height:1.8;">
+        화학 반응식에서 알 수 있는 사실을 친구에게 설명해보세요 ✍️
+      </div>
+    </div>
+  </div>
+
+</div><!-- /panel -->
+
+<!-- BOTTOM BAR -->
+<div id="bot">
+  <div id="feedback">1단계: 반응물과 생성물의 이름을 탭해서 빈칸을 채우세요!</div>
+  <button class="act-btn primary" id="main-btn" onclick="mainAction()">확인</button>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════════ */
+// Step 1 answers (word names)
+const WORDS = ['메테인', '산소', '물', '이산화 탄소'];
+const WORD_CHIPS = ['메테인', '산소', '물', '이산화 탄소', '수소', '질소', '탄소'];
+
+// Step 2 answers (chemical formulas)
+const FORMULAS = ['CH₄', 'O₂', 'H₂O', 'CO₂'];
+const FORMULA_CHIPS = ['CH₄', 'O₂', 'H₂O', 'CO₂', 'N₂', 'H₂', 'C'];
+
+// Step 3: coefficients
+// Reaction: a·CH₄ + b·O₂ → c·H₂O + d·CO₂
+// Correct: 1,2,2,1
+let coefs = [1, 1, 1, 1];
+const COEF_ANS = [1, 2, 2, 1];
+const MOLS = ['CH₄','O₂','H₂O','CO₂'];
+const SIDES = ['r','r','p','p']; // r=reactant, p=product
+// atom composition per molecule
+const ATOMS_IN = {
+  'CH₄':{C:1,H:4,O:0},
+  'O₂' :{C:0,H:0,O:2},
+  'H₂O':{C:0,H:2,O:1},
+  'CO₂':{C:1,H:0,O:2},
+};
+// SVG geometries
+function molSVG(f) {
+  const GEOMS = {
+    'CH₄': {
+      atoms:[{e:'C',x:0,y:0},{e:'H',x:0,y:-38},{e:'H',x:36,y:16},{e:'H',x:-36,y:16},{e:'H',x:0,y:30}],
+      bonds:[[0,1],[0,2],[0,3],[0,4]]
+    },
+    'O₂': {
+      atoms:[{e:'O',x:-19,y:0},{e:'O',x:19,y:0}],
+      bonds:[[0,1,2]]
+    },
+    'H₂O': (()=>{
+      const bL=36,a=104.5*Math.PI/180,h=a/2;
+      return{atoms:[{e:'O',x:0,y:0},{e:'H',x:-bL*Math.sin(h),y:bL*Math.cos(h)},{e:'H',x:bL*Math.sin(h),y:bL*Math.cos(h)}],bonds:[[0,1],[0,2]]};
+    })(),
+    'CO₂': {
+      atoms:[{e:'O',x:-42,y:0},{e:'C',x:0,y:0},{e:'O',x:42,y:0}],
+      bonds:[[0,1,2],[1,2,2]]
+    },
+  };
+  const COLORS = {C:'#78909C',H:'#FFD54F',O:'#EF5350'};
+  const TXTS   = {C:'#fff',H:'#5D4037',O:'#fff'};
+  const RADII  = {C:14,H:11,O:14};
+  const g = GEOMS[f]; if(!g) return '';
+  const PAD=18;
+  const xs=g.atoms.map(a=>a.x), ys=g.atoms.map(a=>a.y);
+  const vx=Math.min(...xs)-PAD, vy=Math.min(...ys)-PAD;
+  const vw=Math.max(...xs)+PAD-vx, vh=Math.max(...ys)+PAD-vy;
+  const maxW=90, maxH=76;
+  const sc=Math.min(maxW/vw,maxH/vh,1);
+  const W=Math.round(vw*sc), H=Math.round(vh*sc);
+  const tx=x=>(x-vx)*sc, ty=y=>(y-vy)*sc, tr=r=>r*sc;
+
+  let svg='';
+  // bonds
+  g.bonds.forEach(b=>{
+    const [i,j,ord=1]=b;
+    const a=g.atoms[i],bb=g.atoms[j];
+    const ax=tx(a.x),ay=ty(a.y),bx=tx(bb.x),by=ty(bb.y);
+    const dx=bx-ax,dy=by-ay,len=Math.sqrt(dx*dx+dy*dy)||1;
+    const nx=-dy/len,ny=dx/len;
+    const gaps=ord===1?[0]:ord===2?[-3,3]:[-5,0,5];
+    gaps.forEach(off=>{
+      svg+=`<line x1="${(ax+nx*off).toFixed(1)}" y1="${(ay+ny*off).toFixed(1)}" x2="${(bx+nx*off).toFixed(1)}" y2="${(by+ny*off).toFixed(1)}" stroke="#546E7A" stroke-width="${(1.8*sc).toFixed(1)}" stroke-linecap="round"/>`;
+    });
+  });
+  // atoms
+  g.atoms.forEach(({e,x,y})=>{
+    const cx=tx(x),cy=ty(y),r=tr(RADII[e]||12);
+    const bg=COLORS[e]||'#aaa', tx2=TXTS[e]||'#fff';
+    svg+=`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="${bg}" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>`;
+    svg+=`<text x="${cx.toFixed(1)}" y="${cy.toFixed(1)}" text-anchor="middle" dominant-baseline="central" fill="${tx2}" font-family="monospace" font-size="${(r*0.9).toFixed(1)}" font-weight="900">${e}</text>`;
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${svg}</svg>`;
+}
+
+/* ══════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════ */
+let currentStep = 0;
+let wordSlots    = [null, null, null, null];
+let fSlots       = [null, null, null, null];
+let selectedChip = null;   // for step1 chip selection
+let selectedFChip= null;   // for step2 chip selection
+let step1Done = false, step2Done = false, step3Done = false;
+
+/* ══════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════ */
+window.onload = () => {
+  buildStep1();
+  buildStep2();
+  buildCoefEq();
+  buildMolRowS1();
+  updateAtomTable();
+};
+
+/* ══════════════════════════════════════════════════
+   STEP NAVIGATION
+══════════════════════════════════════════════════ */
+function goStep(n) {
+  // Only allow going to a step if previous steps done
+  if (n > 0 && !step1Done) { flash('1단계를 먼저 완성해주세요!','warn'); return; }
+  if (n > 1 && !step2Done) { flash('2단계를 먼저 완성해주세요!','warn'); return; }
+  if (n > 2 && !step3Done) { flash('3단계를 먼저 완성해주세요!','warn'); return; }
+  currentStep = n;
+  document.querySelectorAll('.step-panel').forEach((p,i) => p.classList.toggle('show', i===n));
+  document.querySelectorAll('.snav').forEach((s,i) => {
+    s.classList.toggle('active', i===n);
+  });
+  updateBotForStep(n);
+  document.getElementById('panel').scrollTop = 0;
+}
+
+function updateBotForStep(n) {
+  const btn = document.getElementById('main-btn');
+  const msgs = [
+    '1단계: 이름 카드를 탭해 빈칸을 채우세요!',
+    '2단계: 화학식 카드를 선택 후 빈칸을 탭하세요!',
+    '3단계: ▲▼ 버튼으로 계수를 조절하세요!',
+    '화학 반응식에서 알 수 있는 사실을 확인하세요 ✅',
+  ];
+  document.getElementById('feedback').className = 'info';
+  document.getElementById('feedback').textContent = msgs[n];
+  btn.textContent = n < 3 ? '확인' : '처음부터';
+}
+
+/* ══════════════════════════════════════════════════
+   STEP 1 — WORD EQUATION
+══════════════════════════════════════════════════ */
+function buildStep1() {
+  // Chips
+  const pool = document.getElementById('chip-pool-s1');
+  pool.innerHTML = '';
+  WORD_CHIPS.sort(()=>Math.random()-.5).forEach(w => {
+    const el = document.createElement('div');
+    el.className = 'chip';
+    el.id = `wc-${w}`;
+    el.textContent = w;
+    el.onclick = () => selectWordChip(w, el);
+    pool.appendChild(el);
+  });
+}
+
+function buildMolRowS1() {
+  const row = document.getElementById('mol-row-s1');
+  const items = [
+    {f:'CH₄', name:'메테인'},
+    {sym:'+'},
+    {f:'O₂',  name:'산소'},
+    {sym:'→'},
+    {f:'H₂O', name:'물'},
+    {sym:'+'},
+    {f:'CO₂', name:'이산화 탄소'},
+  ];
+  row.innerHTML = '';
+  items.forEach(it => {
+    if(it.sym) {
+      const s = document.createElement('span');
+      s.style.cssText = 'font-size:22px;font-weight:900;color:#1565C0;align-self:center;';
+      s.textContent = it.sym;
+      row.appendChild(s);
+    } else {
+      const card = document.createElement('div');
+      card.className = 'mol-card';
+      card.innerHTML = molSVG(it.f) + `<div class="mol-name">${it.name}</div>`;
+      row.appendChild(card);
+    }
+  });
+}
+
+function selectWordChip(word, el) {
+  // deselect previous
+  document.querySelectorAll('.chip.ring').forEach(c => c.classList.remove('ring'));
+  if (selectedChip === word) { selectedChip = null; return; }
+  selectedChip = word;
+  el.classList.add('ring');
+  // auto-fill first empty slot
+  const emptyIdx = wordSlots.findIndex(s => s === null);
+  if (emptyIdx !== -1) fillSlot(emptyIdx);
+}
+
+function fillSlot(idx) {
+  if (!selectedChip) {
+    // if slot is filled, remove it
+    if (wordSlots[idx]) {
+      const old = wordSlots[idx];
+      wordSlots[idx] = null;
+      document.getElementById(`ws${idx}`).textContent = '?';
+      document.getElementById(`ws${idx}`).className = 'word-slot';
+      const chip = document.getElementById(`wc-${old}`);
+      if(chip) chip.classList.remove('used');
+    }
+    return;
+  }
+  // check if chip already used elsewhere
+  const prevIdx = wordSlots.indexOf(selectedChip);
+  if (prevIdx !== -1 && prevIdx !== idx) {
+    wordSlots[prevIdx] = null;
+    document.getElementById(`ws${prevIdx}`).textContent = '?';
+    document.getElementById(`ws${prevIdx}`).className = 'word-slot';
+  }
+  // place chip
+  const old = wordSlots[idx];
+  if(old){ const c=document.getElementById(`wc-${old}`); if(c) c.classList.remove('used'); }
+  wordSlots[idx] = selectedChip;
+  const slotEl = document.getElementById(`ws${idx}`);
+  slotEl.textContent = selectedChip;
+  slotEl.className = 'word-slot filled';
+  document.getElementById(`wc-${selectedChip}`).classList.add('used');
+  document.querySelectorAll('.chip.ring').forEach(c=>c.classList.remove('ring'));
+  selectedChip = null;
+  checkStep1Inline();
+}
+
+function checkStep1Inline() {
+  let allFilled = wordSlots.every(s => s !== null);
+  if(!allFilled) return;
+  let correct = wordSlots.every((s,i) => s === WORDS[i]);
+  if(correct) {
+    WORDS.forEach((_,i) => {
+      document.getElementById(`ws${i}`).classList.add('correct');
+    });
+    flash('🎉 정답! 반응물은 왼쪽, 생성물은 오른쪽에 바르게 썼어요!', 'ok');
+    step1Done = true;
+    document.getElementById('sn0').classList.add('done');
+  } else {
+    flash('❌ 틀린 곳이 있어요. 다시 확인해보세요!', 'warn');
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   STEP 2 — FORMULA EQUATION
+══════════════════════════════════════════════════ */
+function buildStep2() {
+  const pool = document.getElementById('chip-pool-s2');
+  pool.innerHTML = '';
+  FORMULA_CHIPS.sort(()=>Math.random()-.5).forEach(f => {
+    const el = document.createElement('div');
+    el.className = 'f-chip';
+    el.id = `fc-${f.replace(/[₁-₉]/g,'_')}`;
+    el.textContent = f;
+    el.onclick = () => selectFChip(f, el);
+    pool.appendChild(el);
+  });
+}
+
+function selectFChip(formula, el) {
+  document.querySelectorAll('.f-chip.ring').forEach(c=>c.classList.remove('ring'));
+  if(selectedFChip === formula){ selectedFChip=null; return; }
+  selectedFChip = formula;
+  el.classList.add('ring');
+}
+
+function fillFSlot(idx) {
+  if(!selectedFChip) {
+    if(fSlots[idx]){ 
+      fSlots[idx]=null;
+      document.getElementById(`fs${idx}`).textContent='?';
+      document.getElementById(`fs${idx}`).className='f-slot';
+    }
+    return;
+  }
+  const prevIdx = fSlots.indexOf(selectedFChip);
+  if(prevIdx !== -1 && prevIdx !== idx){ 
+    fSlots[prevIdx]=null;
+    document.getElementById(`fs${prevIdx}`).textContent='?';
+    document.getElementById(`fs${prevIdx}`).className='f-slot';
+  }
+  const old=fSlots[idx];
+  fSlots[idx]=selectedFChip;
+  const el=document.getElementById(`fs${idx}`);
+  el.textContent=selectedFChip;
+  el.className='f-slot filled';
+  document.querySelectorAll('.f-chip.ring').forEach(c=>c.classList.remove('ring'));
+  selectedFChip=null;
+  checkStep2Inline();
+}
+
+function checkStep2Inline() {
+  if(!fSlots.every(s=>s!==null)) return;
+  const correct = fSlots.every((s,i) => s === FORMULAS[i]);
+  if(correct) {
+    FORMULAS.forEach((_,i) => document.getElementById(`fs${i}`).classList.add('correct'));
+    flash('🎉 정답! 모든 화학식이 맞았어요!', 'ok');
+    step2Done = true;
+    document.getElementById('sn1').classList.add('done');
+  } else {
+    flash('❌ 틀린 화학식이 있어요. 힌트: CH₄(메테인), O₂(산소), H₂O(물), CO₂(이산화탄소)', 'warn');
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   STEP 3 — COEFFICIENTS
+══════════════════════════════════════════════════ */
+function buildCoefEq() {
+  const eq = document.getElementById('coef-eq');
+  eq.innerHTML = '';
+  MOLS.forEach((mol, i) => {
+    if(i===2) {
+      const arr = document.createElement('span');
+      arr.className='word-eq-arrow';
+      arr.style.fontSize='26px';
+      arr.textContent='→';
+      eq.appendChild(arr);
+    } else if(i>0) {
+      const pl = document.createElement('span');
+      pl.className='word-eq-plus';
+      eq.appendChild(pl);
+    }
+    const unit = document.createElement('div');
+    unit.className='coef-unit';
+    unit.innerHTML=`
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div class="coef-controls">
+          <button class="coef-btn" onclick="adjCoef(${i},1)">▲</button>
+          <button class="coef-btn" onclick="adjCoef(${i},-1)">▼</button>
+        </div>
+        <div class="coef-box" id="cb${i}">${coefs[i]}</div>
+      </div>
+      <span class="coef-mol">${mol}</span>`;
+    eq.appendChild(unit);
+  });
+  updateAtomTable();
+  updateMolRowS3();
+}
+
+function adjCoef(idx, delta) {
+  const newVal = coefs[idx] + delta;
+  if(newVal < 1 || newVal > 9) return;
+  coefs[idx] = newVal;
+  document.getElementById(`cb${idx}`).textContent = newVal;
+  // highlight correct ones
+  MOLS.forEach((_,i)=>{
+    const box=document.getElementById(`cb${i}`);
+    box.classList.toggle('correct', coefs[i]===COEF_ANS[i]);
+  });
+  updateAtomTable();
+  updateMolRowS3();
+  checkStep3Inline();
+}
+
+function updateAtomTable() {
+  const els = ['C','H','O'];
+  // before (reactants): indices 0,1
+  const before = {C:0,H:0,O:0};
+  // after (products): indices 2,3
+  const after  = {C:0,H:0,O:0};
+  MOLS.forEach((mol,i)=>{
+    const target = SIDES[i]==='r' ? before : after;
+    const comp = ATOMS_IN[mol];
+    els.forEach(e=>{ target[e] += comp[e]*coefs[i]; });
+  });
+  els.forEach(e=>{
+    const bEl=document.getElementById(`tc-${e}-b`);
+    const aEl=document.getElementById(`tc-${e}-a`);
+    bEl.textContent = before[e];
+    aEl.textContent = after[e];
+    const match = before[e]===after[e];
+    bEl.style.color = match ? '#2E7D32' : '#C62828';
+    aEl.style.color = match ? '#2E7D32' : '#C62828';
+    bEl.style.fontWeight = '700';
+    aEl.style.fontWeight = '700';
+  });
+}
+
+function updateMolRowS3() {
+  const row = document.getElementById('mol-row-s3');
+  row.innerHTML = '';
+  const syms = ['→'];
+  MOLS.forEach((mol,i) => {
+    if(i===2){
+      const arr=document.createElement('span');
+      arr.style.cssText='font-size:24px;font-weight:900;color:#1565C0;align-self:center;';
+      arr.textContent='→'; row.appendChild(arr);
+    } else if(i>0){
+      const pl=document.createElement('span');
+      pl.style.cssText='font-size:20px;font-weight:900;color:#90A4AE;align-self:center;';
+      pl.textContent='+'; row.appendChild(pl);
+    }
+    for(let k=0;k<coefs[i];k++){
+      if(k>0){
+        const pl=document.createElement('span');
+        pl.style.cssText='font-size:16px;font-weight:900;color:#CFD8DC;align-self:center;';
+        pl.textContent='+'; row.appendChild(pl);
+      }
+      const card=document.createElement('div');
+      card.className='mol-card';
+      card.innerHTML=molSVG(mol)+`<div class="mol-name">${mol}</div>`;
+      row.appendChild(card);
+    }
+  });
+}
+
+function checkStep3Inline() {
+  const correct = coefs.every((c,i) => c === COEF_ANS[i]);
+  const els=['C','H','O'];
+  const before={C:0,H:0,O:0}, after={C:0,H:0,O:0};
+  MOLS.forEach((mol,i)=>{
+    const t=SIDES[i]==='r'?before:after;
+    els.forEach(e=>{t[e]+=ATOMS_IN[mol][e]*coefs[i];});
+  });
+  const balanced = els.every(e=>before[e]===after[e]);
+  if(correct && balanced) {
+    flash('🎉 완벽! CH₄ + 2O₂ → 2H₂O + CO₂ — 계수가 모두 맞았어요!', 'ok');
+    step3Done = true;
+    document.getElementById('sn2').classList.add('done');
+    document.getElementById('sn3').classList.remove('done');
+    confetti();
+  } else if(balanced) {
+    flash('✅ 원자 수는 균형이 맞았어요! 가장 간단한 정수비인지 확인해보세요.', 'ok');
+  } else {
+    const bad = els.filter(e=>before[e]!==after[e])
+      .map(e=>`${e}: 반응물 ${before[e]} ≠ 생성물 ${after[e]}`);
+    flash(`⚖️ 아직 불균형 — ${bad.join(' / ')}`, 'warn');
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   MAIN BUTTON
+══════════════════════════════════════════════════ */
+function mainAction() {
+  if(currentStep===0) checkStep1();
+  else if(currentStep===1) checkStep2();
+  else if(currentStep===2) checkStep3();
+  else { resetAll(); }
+}
+
+function checkStep1() {
+  if(!wordSlots.every(s=>s!==null)){ flash('⚠️ 모든 빈칸을 채워주세요!','warn'); return; }
+  const correct = wordSlots.every((s,i)=>s===WORDS[i]);
+  if(correct){ step1Done=true; document.getElementById('sn0').classList.add('done'); setTimeout(()=>goStep(1),700); }
+  else flash('❌ 틀린 곳이 있어요. 다시 확인!','warn');
+}
+
+function checkStep2() {
+  if(!fSlots.every(s=>s!==null)){ flash('⚠️ 모든 빈칸을 채워주세요!','warn'); return; }
+  const correct = fSlots.every((s,i)=>s===FORMULAS[i]);
+  if(correct){ step2Done=true; document.getElementById('sn1').classList.add('done'); setTimeout(()=>goStep(2),700); }
+  else flash('❌ 틀린 화학식이 있어요!','warn');
+}
+
+function checkStep3() {
+  const correct = coefs.every((c,i)=>c===COEF_ANS[i]);
+  if(correct){ step3Done=true; document.getElementById('sn2').classList.add('done'); setTimeout(()=>goStep(3),900); }
+  else flash('⚖️ 아직 계수가 맞지 않아요. ▲▼ 버튼을 조절해보세요!','warn');
+}
+
+function resetAll() {
+  wordSlots=[null,null,null,null];
+  fSlots=[null,null,null,null];
+  coefs=[1,1,1,1];
+  step1Done=false; step2Done=false; step3Done=false;
+  selectedChip=null; selectedFChip=null;
+  document.querySelectorAll('.snav').forEach((s,i)=>{
+    s.classList.remove('done','active');
+    if(i===0) s.classList.add('active');
+  });
+  buildStep1(); buildStep2(); buildCoefEq();
+  document.querySelectorAll('.word-slot').forEach(s=>{s.textContent='?';s.className='word-slot';});
+  document.querySelectorAll('.f-slot').forEach(s=>{s.textContent='?';s.className='f-slot';});
+  goStep(0);
+}
+
+/* ══════════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════════ */
+function flash(msg, cls='info') {
+  const fb=document.getElementById('feedback');
+  fb.textContent=msg; fb.className=cls;
+}
+
+let lastBang=0;
+function confetti(){
+  const now=Date.now(); if(now-lastBang<2000)return; lastBang=now;
+  const cols=['#FFD54F','#EF5350','#78909C','#66BB6A','#CE93D8','#80DEEA'];
+  for(let i=0;i<60;i++){
+    const el=document.createElement('div');el.className='cf';
+    const s=6+Math.random()*10;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-10px;
+      background:${cols[Math.floor(Math.random()*cols.length)]};
+      width:${s}px;height:${s}px;
+      border-radius:${Math.random()>.5?'50%':'3px'};
+      animation-delay:${Math.random()*.8}s;`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),2800);
+  }
+}
+</script>
+</body>
+</html>
